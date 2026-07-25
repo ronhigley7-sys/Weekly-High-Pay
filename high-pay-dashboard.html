@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>High Pay Dashboard – 3B Tele Med Surg</title>
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;500;600;700;800&family=Nunito+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{--teal:#006d77;--teal-light:#83c5be;--teal-pale:#edf6f9;--teal-mid:#d4ecf0;--accent:#e29578;--text:#1a2e35;--text-mid:#456068;--text-light:#7a9aa2;--white:#ffffff;--bg:#f4f9fb;--border:#c8dfe5;--success:#2d9e6e;--gold:#c98a2e;--gold-pale:#fdf3e2;--radius-lg:16px;--radius-md:12px;--radius-sm:8px;}
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Nunito Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:40px;}
+.page-header{background:var(--teal);padding:24px 20px 28px;position:relative;overflow:hidden;}
+.page-header::before{content:'';position:absolute;top:-40px;right:-40px;width:160px;height:160px;border-radius:50%;background:rgba(255,255,255,0.07);}
+.header-tag{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.18);border-radius:20px;padding:4px 12px;font-size:11px;font-weight:700;color:rgba(255,255,255,0.9);text-transform:uppercase;letter-spacing:0.08em;margin-bottom:10px;}
+.header-tag .dot{width:6px;height:6px;border-radius:50%;background:#83c5be;animation:blink 2s infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0.3}}
+.header-title{font-family:'Nunito',sans-serif;font-size:26px;font-weight:800;color:white;line-height:1.15;margin-bottom:6px;position:relative;z-index:1;}
+.header-sub{font-size:13px;color:rgba(255,255,255,0.72);position:relative;z-index:1;}
+.sync-status{font-size:11px;margin-top:8px;position:relative;z-index:1;color:rgba(255,255,255,0.6);}
+.container{max-width:900px;margin:0 auto;padding:16px;}
+.week-nav{display:flex;align-items:center;gap:10px;background:white;border:1px solid var(--border);border-radius:var(--radius-md);padding:10px 12px;margin:16px 0;box-shadow:0 2px 12px rgba(0,109,119,0.08);}
+.week-btn{background:var(--teal-pale);border:1.5px solid var(--teal-mid);color:var(--teal);font-weight:700;font-size:13px;border-radius:var(--radius-sm);padding:9px 14px;cursor:pointer;transition:all 0.15s;white-space:nowrap;}
+.week-btn:hover{background:var(--teal-mid);}
+.week-btn:disabled{opacity:0.35;cursor:not-allowed;}
+.week-label{flex:1;text-align:center;font-family:'Nunito',sans-serif;font-weight:800;font-size:15px;color:var(--text);}
+.week-label .this-week-badge{display:inline-block;margin-left:8px;background:var(--success);color:white;font-size:9px;font-weight:800;text-transform:uppercase;letter-spacing:0.05em;padding:2px 8px;border-radius:10px;vertical-align:middle;}
+.stats-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px;}
+.stat-card{background:white;border:1px solid var(--border);border-radius:var(--radius-md);padding:16px;text-align:center;box-shadow:0 2px 12px rgba(0,109,119,0.08);}
+.stat-num{font-family:'Nunito',sans-serif;font-size:30px;font-weight:800;color:var(--teal);line-height:1;}
+.stat-label{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--text-light);margin-top:6px;}
+.staff-card{background:white;border:1px solid var(--border);border-radius:var(--radius-lg);margin-bottom:12px;overflow:hidden;box-shadow:0 2px 12px rgba(0,109,119,0.08);}
+.staff-card-head{display:flex;align-items:center;justify-content:space-between;padding:14px 18px;background:var(--teal-pale);border-bottom:1px solid var(--teal-mid);}
+.staff-name-role{display:flex;align-items:baseline;gap:8px;}
+.staff-name{font-family:'Nunito',sans-serif;font-size:16px;font-weight:800;color:var(--teal);}
+.staff-role{font-size:10px;font-weight:700;padding:2px 8px;border-radius:10px;background:var(--teal-mid);color:var(--teal);text-transform:uppercase;letter-spacing:0.05em;}
+.entry-count-badge{background:var(--gold-pale);color:var(--gold);font-size:11px;font-weight:800;padding:4px 10px;border-radius:12px;border:1px solid rgba(201,138,46,0.3);}
+.entry-count-badge.multi{background:#fff0e8;color:#c0673a;border-color:rgba(226,149,120,0.4);}
+table.entries{width:100%;border-collapse:collapse;}
+table.entries th{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:0.05em;color:var(--text-light);text-align:left;padding:10px 18px 6px;}
+table.entries td{font-size:13px;color:var(--text);padding:8px 18px;border-top:1px solid var(--teal-mid);}
+table.entries tr:first-child td{border-top:none;}
+.empty-state{background:white;border:1px dashed var(--border);border-radius:var(--radius-lg);padding:40px 24px;text-align:center;}
+.empty-state .emoji{font-size:36px;margin-bottom:10px;}
+.empty-state .msg{font-size:14px;font-weight:700;color:var(--teal);margin-bottom:4px;}
+.empty-state .sub{font-size:12px;color:var(--text-light);}
+.print-btn{width:100%;padding:13px;border-radius:var(--radius-md);border:1.5px solid var(--teal);background:white;font-family:'Nunito',sans-serif;font-size:14px;font-weight:800;color:var(--teal);cursor:pointer;margin-top:6px;}
+.print-btn:hover{background:var(--teal-pale);}
+@media print{.week-nav,.print-btn{display:none;}}
+@media (min-width:600px){.stats-row{grid-template-columns:repeat(3,1fr);}}
+</style>
+</head>
+<body>
+
+<div class="page-header">
+  <div class="header-tag"><span class="dot"></span> 3B Tele Med Surg</div>
+  <div class="header-title">High Pay Dashboard</div>
+  <div class="header-sub">Weekly High Pay entries by staff member</div>
+  <div class="sync-status" id="syncStatus">☁️ Connecting...</div>
+</div>
+
+<div class="container">
+
+  <div class="week-nav">
+    <button class="week-btn" id="prevBtn" onclick="shiftWeek(-1)">← Prev</button>
+    <div class="week-label" id="weekLabel">—</div>
+    <button class="week-btn" id="nextBtn" onclick="shiftWeek(1)">Next →</button>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card"><div class="stat-num" id="statEntries">0</div><div class="stat-label">High Pay Entries</div></div>
+    <div class="stat-card"><div class="stat-num" id="statStaff">0</div><div class="stat-label">Staff Involved</div></div>
+    <div class="stat-card" style="grid-column:1 / -1;"><div class="stat-num" id="statTop" style="font-size:16px;">—</div><div class="stat-label">Most Entries This Week</div></div>
+  </div>
+
+  <div id="staffList"></div>
+
+  <button class="print-btn" onclick="window.print()">🖨 Print This Week</button>
+
+</div>
+
+<script>
+// ════════════════════════════════════════════════════════════════
+//  SUPABASE — read-only, same project as staff submission form
+// ════════════════════════════════════════════════════════════════
+const SB_URL = 'https://xnsdvdfceflmagfhpycw.supabase.co';
+const SB_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inhuc2R2ZGZjZWZsbWFnZmhweWN3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Nzk0MTk1NjgsImV4cCI6MjA5NDk5NTU2OH0.UzKZQj4BLxPpH_OCwQR8LyDUeP9YlKn5UtXRFUFaYKA';
+const SB_HEADERS = { apikey: SB_KEY, Authorization: `Bearer ${SB_KEY}` };
+
+async function sbGet(key) {
+  const r = await fetch(`${SB_URL}/rest/v1/tracker_state?key=eq.${key}&select=value`, { headers: SB_HEADERS });
+  if (!r.ok) return null;
+  const rows = await r.json();
+  return rows?.[0]?.value ? JSON.parse(rows[0].value) : null;
+}
+
+function syncStatus(msg, color) {
+  const el = document.getElementById('syncStatus');
+  if (el) { el.textContent = msg; el.style.color = color || 'rgba(255,255,255,0.7)'; }
+}
+
+// ════════════════════════════════════════════════════════════════
+//  WEEK MATH — Monday–Sunday
+// ════════════════════════════════════════════════════════════════
+function mondayOf(d) {
+  const date = new Date(d);
+  const day = date.getDay(); // 0=Sun..6=Sat
+  const diff = (day === 0 ? -6 : 1 - day);
+  date.setDate(date.getDate() + diff);
+  date.setHours(0,0,0,0);
+  return date;
+}
+function toISO(d){ return d.toISOString().split('T')[0]; }
+function fmtShort(d){ const mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; return `${mo[d.getMonth()]} ${d.getDate()}`; }
+
+const thisWeekStart = mondayOf(new Date());
+let weekStart = new Date(thisWeekStart);
+let ALL_HISTORY = [];
+
+function renderWeek() {
+  const weekEnd = new Date(weekStart);
+  weekEnd.setDate(weekEnd.getDate() + 6);
+  const startISO = toISO(weekStart);
+  const endISO = toISO(weekEnd);
+
+  const isCurrentWeek = startISO === toISO(thisWeekStart);
+  document.getElementById('weekLabel').innerHTML =
+    `${fmtShort(weekStart)} – ${fmtShort(weekEnd)}` + (isCurrentWeek ? ' <span class="this-week-badge">This Week</span>' : '');
+  document.getElementById('nextBtn').disabled = weekStart >= thisWeekStart;
+
+  const entries = ALL_HISTORY.filter(e =>
+    Array.isArray(e.payout) && e.payout.includes('High Pay') &&
+    e.date >= startISO && e.date <= endISO
+  );
+
+  document.getElementById('statEntries').textContent = entries.length;
+  const staffSet = new Set(entries.map(e => e.staff));
+  document.getElementById('statStaff').textContent = staffSet.size;
+
+  // Group by staff
+  const byStaff = {};
+  entries.forEach(e => {
+    if (!byStaff[e.staff]) byStaff[e.staff] = { role: e.role, entries: [] };
+    byStaff[e.staff].entries.push(e);
+  });
+  const staffNames = Object.keys(byStaff).sort((a,b) => byStaff[b].entries.length - byStaff[a].entries.length || a.localeCompare(b));
+
+  const top = staffNames[0];
+  document.getElementById('statTop').textContent = top ? `${top} (${byStaff[top].entries.length})` : '—';
+
+  const listEl = document.getElementById('staffList');
+  if (!staffNames.length) {
+    listEl.innerHTML = `
+      <div class="empty-state">
+        <div class="emoji">✅</div>
+        <div class="msg">No High Pay entries this week</div>
+        <div class="sub">Nothing to review for ${fmtShort(weekStart)} – ${fmtShort(weekEnd)}</div>
+      </div>`;
+    return;
+  }
+
+  listEl.innerHTML = staffNames.map(name => {
+    const s = byStaff[name];
+    const rows = s.entries
+      .sort((a,b) => a.date.localeCompare(b.date))
+      .map(e => `<tr>
+        <td>${formatDate(e.date)}</td>
+        <td>${e.shift||'—'}</td>
+        <td>${e.unit||'—'}</td>
+        <td>${e.highPayAuthorizedBy||'—'}</td>
+      </tr>`).join('');
+    const badgeClass = s.entries.length > 1 ? 'entry-count-badge multi' : 'entry-count-badge';
+    return `
+      <div class="staff-card">
+        <div class="staff-card-head">
+          <div class="staff-name-role">
+            <span class="staff-name">${name}</span>
+            <span class="staff-role">${s.role||''}</span>
+          </div>
+          <span class="${badgeClass}">${s.entries.length} ${s.entries.length===1?'entry':'entries'}</span>
+        </div>
+        <table class="entries">
+          <thead><tr><th>Date</th><th>Shift</th><th>Unit</th><th>Authorized By</th></tr></thead>
+          <tbody>${rows}</tbody>
+        </table>
+      </div>`;
+  }).join('');
+}
+
+function formatDate(d){ if(!d) return '—'; const [y,m,day]=d.split('-'); const mo=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec']; return `${mo[+m-1]} ${+day}`; }
+
+function shiftWeek(dir) {
+  weekStart.setDate(weekStart.getDate() + dir*7);
+  if (weekStart > thisWeekStart) weekStart = new Date(thisWeekStart);
+  renderWeek();
+}
+
+// ── Init ──────────────────────────────────────────────────────
+(async () => {
+  try {
+    syncStatus('☁️ Loading High Pay history...', 'rgba(255,255,255,0.6)');
+    ALL_HISTORY = await sbGet('float_history') || [];
+    syncStatus(`☁️ Connected · ${ALL_HISTORY.length} total records`, '#83c5be');
+  } catch(e) {
+    syncStatus('⚠ Could not reach Supabase', 'orange');
+  }
+  renderWeek();
+})();
+</script>
+</body>
+</html>
